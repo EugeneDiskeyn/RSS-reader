@@ -1,0 +1,1 @@
+(()=>{console.log("Hello World!");const e=document.createElement("p");e.innerHTML="New component",document.querySelector("body").appendChild(e)})();
