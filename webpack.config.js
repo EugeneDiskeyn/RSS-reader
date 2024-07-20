@@ -1,12 +1,16 @@
-// Generated using webpack-cli https://github.com/webpack/webpack-cli
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-import { autoprefixer } from 'autoprefixer';
-import { HtmlWebpackPlugin } from 'html-webpack-plugin';
+const mode = process.env.NODE_ENV || 'development';
 
-const isProduction = process.env.NODE_ENV == 'production';
-
-
-const config = {
+export default {
+    mode,
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'index.html',
+        }),
+        new MiniCssExtractPlugin(),
+    ],
     entry: './src/index.js',
     output: {
         clean: true
@@ -15,52 +19,21 @@ const config = {
         open: true,
         host: 'localhost',
     },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: 'index.html',
-        }),
-    ],
     module: {
-        rules: [
-            {
-              test: /\.(scss)$/,
-              use: [
-                {
-                  // Adds CSS to the DOM by injecting a `<style>` tag
-                  loader: 'style-loader'
-                },
-                {
-                  // Interprets `@import` and `url()` like `import/require()` and will resolve them
-                  loader: 'css-loader'
-                },
-                {
-                  // Loader for webpack to process CSS with PostCSS
-                  loader: 'postcss-loader',
-                  options: {
-                    postcssOptions: {
-                      plugins: [
-                        autoprefixer
-                      ]
-                    }
-                  }
-                },
-                {
-                  // Loads a SASS/SCSS file and compiles it to CSS
-                  loader: 'sass-loader'
-                }
-              ]
-            }
-        ],
+      rules: [
+        { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'] },
+        {
+          test: /\.scss$/,
+          use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
+        },
+        {
+          test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          use: 'url-loader?limit=10000',
+        },
+        {
+          test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
+          use: 'file-loader',
+        },
+      ],
     },
-};
-
-module.exports = () => {
-    if (isProduction) {
-        config.mode = 'production';
-        
-        
-    } else {
-        config.mode = 'development';
-    }
-    return config;
 };
