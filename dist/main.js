@@ -1,1 +1,1 @@
-(()=>{console.log("Hello World!");const e=document.createElement("p");e.innerHTML="New component",document.querySelector("body").appendChild(e)})();
+(()=>{"use strict";console.log("Hello World!"),document.createElement("p").innerHTML="New component"})();
