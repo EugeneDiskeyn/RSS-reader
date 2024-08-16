@@ -1,52 +1,46 @@
 import "./styles.scss";
 import 'bootstrap';
 import { string, setLocale } from 'yup';
-import onChange from "on-change";
-import i18next from "i18next";
-import initDictionary from "./dictionary.js";
+import { createInstance } from "i18next";
+import getDictionary from "./dictionary.js";
+import getWatchedState from "./view.js";
+
 
 const index = () => {
 
-    initDictionary();
+    const i18n = createInstance();
 
-    const state = { 
-        urls: [],
-        errors: {
-            "validation": "validationError",
-            "repeatance": "repeatanceError"
-        }
-    };
-    const form = document.querySelector("form");
-    const input = document.querySelector("input");
-    const message = document.querySelector("p");
-
-    setLocale({
-        mixed: {
-            notOneOf: i18next.t(state.errors.repeatance)
-        },
-        string: {
-            url: i18next.t(state.errors.validation)
-        }
-    })
-
-    const watchedObject = onChange(state, () => {
-        input.value = "";
-        input.focus();
-    });
-
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const schema = string().url().notOneOf(watchedObject.urls).required();
-        schema.validate(input.value)
-        .then(() => {
-            message.innerHTML = "";
-            input.classList.remove("is-invalid");
-            watchedObject.urls.push(input.value);
+    i18n.init(getDictionary()).then(() => {
+    
+        setLocale({
+            mixed: {
+                notOneOf: "repeatedError"
+            },
+            string: {
+                url: "validationError"
+            }
         })
-        .catch((error) => {
-            message.innerHTML = error.errors[0];
-            input.classList.add("is-invalid");
-        });
+        
+        const form = document.querySelector("form");
+        const input = document.querySelector("input");
+    
+        const watchedState = getWatchedState();
+    
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const schema = string().url().notOneOf(watchedState.urls).required();
+
+            schema.validate(input.value)
+            .then(() => {
+                watchedState.error = "";
+                watchedState.urls.push(input.value);
+            })
+            .catch((err) => {
+                watchedState.error = i18n.t(err.errors[0]);
+                input.classList.add("is-invalid");
+            });
+        })
     })
 }
 

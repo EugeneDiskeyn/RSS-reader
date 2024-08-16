@@ -1,7 +1,5 @@
-import i18next from "i18next"
-
-const initDictionary = () => {
-    i18next.init({
+const getDictionary = () => {
+    return {
         lng: "rus",
         debug: true,
         resources: {
@@ -18,7 +16,7 @@ const initDictionary = () => {
                 }
             }
         }
-    })
+    }
 }
 
-export default initDictionary;
+export default getDictionary;
