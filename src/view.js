@@ -79,31 +79,21 @@ const createNewPosts = (items) => {
         const a = document.createElement("a");
         
         postLi.classList.add("list-group-item", "border-0", "pt-2", "d-flex", "justify-content-between", "align-items-center");
-        button.classList.add("btn", "btn-outline-primary", "btn-sm")
+        button.classList.add("btn", "btn-outline-primary", "btn-sm");
+        button.dataset.bsTarget = "#modal";
+        button.dataset.bsToggle = "modal";
 
         button.innerHTML = "Просмотр";
+
+        button.addEventListener("click", () => {
+            document.getElementById("title").innerHTML = item.title;
+            document.getElementById("description").innerHTML = item.description;
+            document.getElementById("readMore").href = item.link;
+        })
 
         a.innerHTML = item.title;
         a.href = item.link;
         a.target = "_blank"
-
-        // button.addEventListener("click", () => {
-        //     const popup = document.createElement("div");
-        //     popup.classList.add("position-absolute", "w-100", "h-100", "top-0");
-        //     popup.style = "background-color: rgba(255, 255, 255, 0.5)";
-
-        //     popup.innerHTML = 
-        //     `
-        //     <div>
-        //         <h2>${item.title}</h2>
-        //         <p>${item.description}</p>
-        //         <button>Читать полностью</button>
-        //         <button>Закрыть</button>
-        //     </div>
-        //     `;
-
-        //     document.querySelector("body").appendChild(popup);
-        // })
 
         postLi.append(a);
         postLi.append(button);

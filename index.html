@@ -14,7 +14,7 @@
             </form>
         </div>
         <div class="container mt-4">
-            <div class="row mx-auto">
+            <div class="row mx-auto mb-5">
                 <div class="col-8 invisible" id="posts">
                     <h2 class="p-3">Посты</h2>
                     <ul class="list-group" id="posts"></ul>
@@ -22,6 +22,22 @@
                 <div class="col-4 invisible" id="feeds">
                     <h2 class="p-3">Фиды</h2>
                     <ul class="list-group" id="feeds"></ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-between">
+                        <h5 class="modal-title" id="title"></h5>
+                        <button type="button" class="btn-close close border-0" data-dismiss="modal" aria-label="Close" data-bs-target="#modal" data-bs-toggle="modal">
+                    </div>
+                    <div class="modal-body" id="description"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Закрыть</button>
+                        <a id="readMore" target="_blank" type="button" class="btn btn-primary">Читать полностью</a>
+                    </div>
                 </div>
             </div>
         </div>
