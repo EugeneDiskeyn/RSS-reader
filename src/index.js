@@ -37,9 +37,8 @@ const index = () => {
                 .then(response => new DOMParser().parseFromString(response.data.contents, "text/xml"))
                 .then(doc => doc.querySelector("channel"))
                 .then(channel => {
-                    console.log(channel.querySelectorAll("item")[0].innerHTML)
                     if (watchedState.timeout) {
-                        clearInterval(watchedState.timeout)
+                        clearTimeout(watchedState.timeout)
                     }
                     
                     watchedState.rss = getRss(channel);
@@ -47,7 +46,10 @@ const index = () => {
                     watchedState.error = "";
                     watchedState.lastItems.push(watchedState.rss.items[0].title);
 
-                    watchedState.timeout = setInterval(() => repeatedFetch(watchedState), 5000);
+                    watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), 5000);
+                })
+                .catch(() => {
+                    console.log("Can't connect");
                 })
             })
             .catch((err) => {
@@ -67,7 +69,7 @@ const repeatedFetch = (watchedState) => {
         .then(channel => {
             const newItems = [];
             const items = getItems(channel);
-            const iIndex = getItemIndex(items, watchedState.lastItems[index]);
+            const iIndex = getLastItemIndex(items, watchedState.lastItems[index]);
             for (let i = 0; i < iIndex; i++) {
                 newItems.push(items[i]);
             }
@@ -75,12 +77,17 @@ const repeatedFetch = (watchedState) => {
                 watchedState.lastItems[index] = newItems[0].title;
             }
             watchedState.newItems = newItems;
+
+            watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), 5000);
+        })
+        .catch(() => {
+            console.log("Connection was lost");
         })
     })
 }
 
 
-const getItemIndex = (items, lastItem) => {
+const getLastItemIndex = (items, lastItem) => {
     let iIndex = -1;
     items.forEach((item, ind) => {
         if (lastItem === item.title) {
