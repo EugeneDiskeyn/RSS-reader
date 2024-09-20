@@ -33,8 +33,8 @@ const index = () => {
             const schema = string().url().notOneOf(watchedState.urls).required(); 
             schema.validate(input.value)
             .then(() => {
-                axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(input.value)}`)
-                .then(response => new DOMParser().parseFromString(response.data.contents, "text/xml"))
+                axios.get(getURL(input.value))
+                .then(response => parseResponse(response))
                 .then(doc => doc.querySelector("channel"))
                 .then(channel => {
                     if (watchedState.timeout) {
@@ -62,23 +62,29 @@ const index = () => {
 
 
 const repeatedFetch = (watchedState) => {
+    
     watchedState.urls.forEach((url, index) => {
-        axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+    const timeoutTime = 5000;
+
+        axios.get(getURL(url))
         .then(response => new DOMParser().parseFromString(response.data.contents, "text/xml"))
         .then(doc => doc.querySelector("channel"))
         .then(channel => {
             const newItems = [];
             const items = getItems(channel);
             const iIndex = getLastItemIndex(items, watchedState.lastItems[index]);
+
             for (let i = 0; i < iIndex; i++) {
                 newItems.push(items[i]);
             }
+
             if (newItems[0]) {
                 watchedState.lastItems[index] = newItems[0].title;
             }
+
             watchedState.newItems = newItems;
 
-            watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), 5000);
+            watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), timeoutTime);
         })
         .catch(() => {
             console.log("Connection was lost");
@@ -130,5 +136,11 @@ const getText = (element, name) => {
     return element.querySelector(name).innerHTML.replace("<![CDATA[", "").replace("]]>", "");
 }
 
+const parseResponse = (response) => {
+    return new DOMParser().parseFromString(response.data.contents, "text/xml");
+}
 
+const getURL = (url) => {
+    return `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+}
 export { index };

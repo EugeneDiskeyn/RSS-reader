@@ -11,7 +11,7 @@ export default {
         }),
         new MiniCssExtractPlugin(),
     ],
-    entry: './bin/rssReader.js',
+    entry: './rssReader/rssReader.js',
     output: {
         clean: true
     },

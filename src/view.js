@@ -8,7 +8,7 @@ const getWatchedState = () => {
         lastItems: [],
         rss: "",
         error: "",
-        interval: ""
+        timeout: ""
     };
 
     const input = document.querySelector("input");
@@ -89,6 +89,7 @@ const createNewPosts = (items) => {
             document.getElementById("title").innerHTML = item.title;
             document.getElementById("description").innerHTML = item.description;
             document.getElementById("readMore").href = item.link;
+            a.classList.add("link-secondary")
         })
 
         a.innerHTML = item.title;
