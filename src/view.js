@@ -3,9 +3,11 @@ import onChange from "on-change";
 
 const getWatchedState = () => {
 
-    const state = { 
+    const state = {
+        status: "", 
         urls: [],
         lastItems: [],
+        newItems: [],
         rss: "",
         error: "",
         timeout: ""
@@ -15,18 +17,19 @@ const getWatchedState = () => {
     const message = document.querySelector("p");
 
     const watchedState = onChange(state, (path) => {
-        switch (path) {
-            case "urls":
-                handleUpdateInput(input, message);
-                break;
-            case "error":
-                handleError(watchedState, message);
-                break;
-            case "rss":
-                handlePosts(watchedState.rss);
-                break;
-            case "newItems":
-                createNewPosts(watchedState.newItems);
+        if (path === "status") {
+            console.log(watchedState.status)
+            switch (watchedState.status) {
+                case "successfuly loaded":
+                    handleUpdateInput(input, message);
+                    handlePosts(watchedState.rss);
+                    break;
+                case "invalid url":
+                    handleError(watchedState, message);
+                    break;
+                case "successfuly updated":
+                    createNewPosts(watchedState.newItems);
+            }
         }
     });
 
