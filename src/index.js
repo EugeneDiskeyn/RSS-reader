@@ -24,8 +24,19 @@ const index = () => {
         
         const form = document.querySelector("form");
         const input = document.querySelector("input");
+        // const language = document.getElementById("language");
     
-        const watchedState = getWatchedState();
+        const watchedState = getWatchedState(i18n);
+
+        // language.addEventListener("click", () => {
+        //     if (i18n.language === "rus") {
+        //         i18n.changeLanguage("en");
+        //         language.querySelector("p").innerHTML = "ENG";
+        //     } else if (i18n.language === "en") {
+        //         i18n.changeLanguage("rus");
+        //         language.querySelector("p").innerHTML = "RUS";
+        //     }
+        // })
 
         form.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -44,12 +55,14 @@ const index = () => {
 
                 })
                 .catch(() => {
-                    watchedState.status = "lost internet connection";
+                    watchedState.error = i18n.t("networkError");
+                    watchedState.formStatus = "network error";
                 })
             })
             .catch((err) => {
+                console.log(i18n.t(err.errors[0]))
                 watchedState.error = i18n.t(err.errors[0]);
-                watchedState.status = "invalid url";
+                watchedState.formStatus = "invalid url";
                 input.classList.add("is-invalid");
             });
         })
@@ -69,9 +82,6 @@ const repeatedFetch = (watchedState) => {
 
             set_Watched_State_For_Repeated_Fetch(watchedState, channel, timeoutTime, index);
 
-        })
-        .catch(() => {
-            watchedState.status = "no internet connection";
         })
     })
 }
@@ -125,7 +135,7 @@ const set_Watched_State_For_Initial_Fetch = (watchedState, channel, input) => {
     watchedState.urls.push(input.value);
     watchedState.error = "";
     watchedState.lastItems.push(watchedState.rss.items[0].title);
-    watchedState.status = "successfuly loaded";
+    watchedState.formStatus = "successfuly loaded";
 
     watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), 5000);
 }
@@ -145,12 +155,6 @@ const set_Watched_State_For_Repeated_Fetch = (watchedState, channel, timeoutTime
     }
 
     watchedState.newItems = newItems;
-
-    if (newItems.length) {
-        watchedState.status = "successfuly updated";
-    } else {
-        watchedState.status = "waiting for update";
-    }
     watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), timeoutTime);
 }
 
@@ -168,7 +172,6 @@ const parseResponse = (response) => {
 const getURL = (url) => {
     return `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
 }
-
 
 
 export { index };

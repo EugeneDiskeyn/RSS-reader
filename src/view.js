@@ -1,14 +1,17 @@
 import onChange from "on-change";
 
 
-const getWatchedState = () => {
+const getWatchedState = (i18n) => {
+
+    setHTMLelements(i18n);
 
     const state = {
-        status: "", 
+        formStatus: "", 
         urls: [],
         lastItems: [],
         newItems: [],
         rss: "",
+        // currentLanguage: "rus",
         error: "",
         timeout: ""
     };
@@ -16,30 +19,32 @@ const getWatchedState = () => {
     const input = document.querySelector("input");
     const message = document.querySelector("p");
 
+    
     const watchedState = onChange(state, (path) => {
-        if (path === "status") {
-            console.log(watchedState.status)
-            switch (watchedState.status) {
-                case "successfuly loaded":
-                    handleUpdateInput(input, message);
-                    handlePosts(watchedState.rss);
-                    break;
-                case "invalid url":
-                    handleError(watchedState, message);
-                    break;
-                case "successfuly updated":
-                    createNewPosts(watchedState.newItems);
-            }
+        if (path === "newItems") {
+            createNewPosts(watchedState.newItems, i18n);
         }
+        
+        switch (watchedState.formStatus) {
+            case "successfuly loaded":
+                handleUpdateInput(input, message);
+                handlePosts(watchedState.rss, i18n);
+                break;
+            case "network error":
+            case "invalid url":
+                handleError(watchedState, message);
+
+        }
+        watchedState.formStatus = "";
     });
 
     return watchedState;
 }
 
 
-const handlePosts = (rss) => {
+const handlePosts = (rss, i18n) => {
     createNewFeed(rss);
-    createNewPosts(rss.items);
+    createNewPosts(rss.items, i18n);
 }
 
 
@@ -68,7 +73,7 @@ const createNewFeed = (rss) => {
 }
 
 
-const createNewPosts = (items) => {
+const createNewPosts = (items, i18n) => {
     const posts = document.getElementById("posts");
 
     const reverseItems = [];
@@ -86,7 +91,7 @@ const createNewPosts = (items) => {
         button.dataset.bsTarget = "#modal";
         button.dataset.bsToggle = "modal";
 
-        button.innerHTML = "Просмотр";
+        button.innerHTML = i18n.t("view");
 
         button.addEventListener("click", () => {
             document.getElementById("title").innerHTML = item.title;
@@ -106,6 +111,21 @@ const createNewPosts = (items) => {
     })
 
     posts.classList.remove("invisible");
+}
+
+
+const setHTMLelements = (i18n) => {
+    const postHeader = document.getElementById("posts").querySelector("h2");
+    const feedHeader = document.getElementById("feeds").querySelector("h2");
+    const closeButton = document.getElementById("closeButton");
+    const readMore = document.getElementById("readMore");
+    const header1 = document.querySelector("h1");
+
+    postHeader.innerHTML = i18n.t("posts");
+    feedHeader.innerHTML = i18n.t("feeds");
+    closeButton.innerHTML = i18n.t("close");
+    readMore.innerHTML = i18n.t("readMore");
+    header1.innerHTML = i18n.t("rssReader");
 }
 
 

@@ -9,7 +9,7 @@
             <form class="row col-8 mx-auto">
                 <h1 class="display-3 p-0 mb-3">RSS агрегатор</h1>
                 <input autofocus required placeholder="RSS ссылка" class="form-control w-75  me-4" />
-                <button class="col btn btn-primary text-center py-3">Добавить</button>
+                <button id="addButton" class="col btn btn-primary text-center py-3">Добавить</button>
                 <p class = "mt-2 text-danger"></p>
             </form>
         </div>
@@ -35,11 +35,15 @@
                     </div>
                     <div class="modal-body" id="description"></div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"  data-bs-dismiss="modal">Закрыть</button>
+                        <button id="closeButton" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                         <a id="readMore" target="_blank" type="button" class="btn btn-primary">Читать полностью</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- <div id="language" class="fixed-top">
+            <p type="button" class="d-inline mt-3 ms-3 font-weight-bold text-white">RUS</p>
+        </div> -->
     </body>
 </html>
