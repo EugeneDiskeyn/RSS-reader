@@ -10,6 +10,7 @@ import axios from "axios";
 const index = () => {
 
     const i18n = createInstance();
+    console.log("Created")
 
     i18n.init(dictionary).then(() => {
     
@@ -38,7 +39,7 @@ const index = () => {
         //     }
         // })
 
-        form.addEventListener("submit", function (event) {
+        form.addEventListener("submit", (event) => {
             event.preventDefault();
 
             const schema = string().url().notOneOf(watchedState.urls).required(); 
@@ -48,10 +49,9 @@ const index = () => {
 
                 axios.get(getURL(input.value))
                 .then(response => parseResponse(response))
-                .then(doc => doc.querySelector("channel"))
-                .then(channel => {
+                .then(rss => {
 
-                    set_Watched_State_For_Initial_Fetch(watchedState, channel, input)
+                    set_Watched_State_For_Initial_Fetch(watchedState, rss, input)
 
                 })
                 .catch(() => {
@@ -71,30 +71,46 @@ const index = () => {
 
 
 const repeatedFetch = (watchedState) => {
-    
-    watchedState.urls.forEach((url, index) => {
     const timeoutTime = 5000;
+
+    watchedState.urls.forEach((url, index) => {
 
         axios.get(getURL(url))
         .then(response => parseResponse(response))
-        .then(doc => doc.querySelector("channel"))
-        .then(channel => {
+        .then(rss => {
 
-            set_Watched_State_For_Repeated_Fetch(watchedState, channel, timeoutTime, index);
+            set_Watched_State_For_Repeated_Fetch(watchedState, rss, index);
 
         })
     })
+
+    watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), timeoutTime);
 }
 
 
-const getLastItemIndex = (items, lastItem) => {
-    let iIndex = -1;
-    items.forEach((item, ind) => {
-        if (lastItem === item.title) {
-            iIndex = ind;
-        }
-    })
-    return iIndex;
+const set_Watched_State_For_Repeated_Fetch = (watchedState, rss, index) => {
+    const newItems = [];
+    const items = rss.items;
+    const iIndex = getLastItemIndex(items, watchedState.lastItems[index]);
+
+    for (let i = 0; i < iIndex; i++) {
+        newItems.push(items[i]);
+    }
+
+    if (newItems[0]) {
+        watchedState.lastItems[index] = newItems[0].title;
+    }
+
+    watchedState.newItems = newItems;
+}
+
+
+
+const parseResponse = (response) => {
+    const doc = new DOMParser().parseFromString(response.data.contents, "text/xml");
+    const channel = doc.querySelector("channel");
+    const rss = getRss(channel);
+    return rss;
 }
 
 
@@ -102,11 +118,8 @@ const getRss = (channel) => {
     const rss = {
         title: getText(channel, "title"),
         description: getText(channel, "description"),
-        items: ""
+        items: getItems(channel)
     }
-
-    rss.items = getItems(channel);
-
     return rss;
 }
 
@@ -126,12 +139,12 @@ const getItems = (channel) => {
 }
 
 
-const set_Watched_State_For_Initial_Fetch = (watchedState, channel, input) => {
+const set_Watched_State_For_Initial_Fetch = (watchedState, rss, input) => {
     if (watchedState.timeout) {
-        clearTimeout(watchedState.timeout)
+        clearTimeout(watchedState.timeout);
     }
     
-    watchedState.rss = getRss(channel);
+    watchedState.rss = rss;
     watchedState.urls.push(input.value);
     watchedState.error = "";
     watchedState.lastItems.push(watchedState.rss.items[0].title);
@@ -141,31 +154,19 @@ const set_Watched_State_For_Initial_Fetch = (watchedState, channel, input) => {
 }
 
 
-const set_Watched_State_For_Repeated_Fetch = (watchedState, channel, timeoutTime, index) => {
-    const newItems = [];
-    const items = getItems(channel);
-    const iIndex = getLastItemIndex(items, watchedState.lastItems[index]);
-
-    for (let i = 0; i < iIndex; i++) {
-        newItems.push(items[i]);
-    }
-
-    if (newItems[0]) {
-        watchedState.lastItems[index] = newItems[0].title;
-    }
-
-    watchedState.newItems = newItems;
-    watchedState.timeout = setTimeout(() => repeatedFetch(watchedState), timeoutTime);
+const getLastItemIndex = (items, lastItem) => {
+    let iIndex = -1;
+    items.forEach((item, ind) => {
+        if (lastItem === item.title) {
+            iIndex = ind;
+        }
+    })
+    return iIndex;
 }
 
 
 const getText = (element, name) => {
     return element.querySelector(name).innerHTML.replace("<![CDATA[", "").replace("]]>", "");
-}
-
-
-const parseResponse = (response) => {
-    return new DOMParser().parseFromString(response.data.contents, "text/xml");
 }
 
 
