@@ -15,3 +15,6 @@
 You can use this site to read RSS feeds. Just type a URL of the feed you need and read the latest posts
 
 Link to the deployed project: https://rss-reader-phi-bay.vercel.app/
+
+
+![Internet page view](https://drive.google.com/uc?export=view&id=1Ze9u_UZEIPW-Yb7TdQS3V655Yc_dUdA_)

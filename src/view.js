@@ -2,7 +2,6 @@ import onChange from "on-change";
 
 
 const getWatchedState = (i18n) => {
-
     setHTMLelements(i18n);
 
     const state = {

@@ -8,12 +8,9 @@ import axios from "axios";
 
 
 const index = () => {
-
     const i18n = createInstance();
-    console.log("Created")
 
     i18n.init(dictionary).then(() => {
-    
         setLocale({
             mixed: {
                 notOneOf: "repeatedError"
@@ -50,9 +47,7 @@ const index = () => {
                 axios.get(getURL(input.value))
                 .then(response => parseResponse(response))
                 .then(rss => {
-
-                    set_Watched_State_For_Initial_Fetch(watchedState, rss, input)
-
+                    set_Watched_State_For_Initial_Fetch(watchedState, rss, input);
                 })
                 .catch(() => {
                     watchedState.error = i18n.t("networkError");
@@ -60,7 +55,6 @@ const index = () => {
                 })
             })
             .catch((err) => {
-                console.log(i18n.t(err.errors[0]))
                 watchedState.error = i18n.t(err.errors[0]);
                 watchedState.formStatus = "invalid url";
                 input.classList.add("is-invalid");
@@ -74,13 +68,10 @@ const repeatedFetch = (watchedState) => {
     const timeoutTime = 5000;
 
     watchedState.urls.forEach((url, index) => {
-
         axios.get(getURL(url))
         .then(response => parseResponse(response))
         .then(rss => {
-
             set_Watched_State_For_Repeated_Fetch(watchedState, rss, index);
-
         })
     })
 
